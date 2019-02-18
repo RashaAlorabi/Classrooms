@@ -98,6 +98,28 @@ def student_create(request,classroom_id):
     }
     return render(request, 'create_student.html', context)
 
+def student_update(request, student_id):
+    student = Student.objects.get(id=student_id)
+    form = StudentForm(instance=student)
+    if request.method == "POST":
+        form = StudentForm(request.POST, request.FILES or None, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Successfully Edited!")
+            return redirect('classroom-detail',student.classroom.id)
+        print (form.errors)
+    context = {
+    "form": form,
+    "student": student,
+    }
+    return render(request, 'update_student.html', context)
+
+def student_delete(request, student_id):
+    student=Student.objects.get(id=student_id)
+    student.delete()
+    messages.success(request, "Successfully Deleted!")
+    return redirect('classroom-detail', student.classroom.id)
+
 
 def classroom_update(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
@@ -118,6 +140,7 @@ def classroom_update(request, classroom_id):
     return render(request, 'update_classroom.html', context)
 
 
+
 def classroom_delete(request, classroom_id):
     classroom_obj=Classroom.objects.get(id=classroom_id).delete()
     if not (request.user.is_staff):
@@ -125,3 +148,7 @@ def classroom_delete(request, classroom_id):
     classroom_obj.delete()
     messages.success(request, "Successfully Deleted!")
     return redirect('classroom-list')
+
+
+
+

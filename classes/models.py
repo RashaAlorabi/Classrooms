@@ -21,7 +21,7 @@ class Student(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     exam_grade =models.DecimalField(max_digits=6, decimal_places=2)
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE,related_name='student') 
 
     def __str__(self):
         return self.name
