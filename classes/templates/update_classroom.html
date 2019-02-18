@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% block title %}Update{% endblock title %}
 
 {% block content %}
 	<form action="{% url 'classroom-update' classroom.id %}" method="POST" enctype="multipart/form-data">
