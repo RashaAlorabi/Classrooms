@@ -12,17 +12,18 @@ class Classroom(models.Model):
     def get_absolute_url(self):
         return reverse('classroom-detail', kwargs={'classroom_id':self.id})
 
-class Student(models.Model):
-    GENDER_CHOICES = (
+GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
     )
+class Student(models.Model):
     name = models.CharField(max_length=120)
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    exam_grade =models.DecimalField(max_digits=6, decimal_places=2)
+    exam_grade =models.FloatField()
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE,related_name='students') 
 
     def __str__(self):
         return self.name
+
     

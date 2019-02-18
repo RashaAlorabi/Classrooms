@@ -22,8 +22,8 @@
       <th scope="col">ID</th>
       <th scope="col">Name</th>
       <th scope="col">Date of Birth</th>
-      <th scope="col">gender</th>
-      <th scope="col">exam_grade</th>
+      <th scope="col">Gender</th>
+      <th scope="col">Exam_grade</th>
       <th scope="col">classroom</th>
       <th scope="col">Update</th>
       <th scope="col">Delate</th>
@@ -38,10 +38,8 @@
       <td>{{student.gender}}</td>
       <td>{{student.exam_grade}}</td>
       <td>{{student.classroom.id}}</td>
-      {% if request.user == classroom.teacher %}
-      <td> <a href="{% url 'student-update' student.id %}" class="btn" style="background-color: #000034; color: white;">Update</a></td>
-      <td> <a href="{% url 'student-delete' student.id %}" class="btn" style="background-color: #FFA500; color: #000034;">Delete</a></td>
-       {% endif %}
+      <td> <a href="{% url 'student-update' student.id %}" class="btn btn-info" style="background-color: #000034; color: white;">Update</a></td>
+      <td> <a href="{% url 'student-delete' student.id %}" class="btn btn-danger" style="background-color: #FFA500; color: #000034;">Delete</a></td>
     </tr>
   </tbody>
   {% endfor %}

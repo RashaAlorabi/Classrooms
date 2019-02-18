@@ -10,7 +10,7 @@
   <h5 class="card-header">Add Student</h5>
   <div class="card-body">
     <p class="card-text">
-        <form action="{% url 'student-create' classroom.id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'student-create' classroom.id %}" method="POST">
             {% csrf_token %}
             {{form|crispy}}
             <input type="submit" value="Add Student" class="btn btn-outline-success">

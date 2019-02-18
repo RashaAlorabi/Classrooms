@@ -29,16 +29,14 @@ def signin(request):
     if request.method == 'POST':
         form = SigninForm(request.POST)
         if form.is_valid():
-
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-
             auth_user = authenticate(username=username, password=password)
             if auth_user is not None:
                 login(request, auth_user)
                 messages.success(request, "Successfully Siginin") 
                 return redirect('classroom-list')
-            messages.warning(request, "incorrect username/password combination")
+            messages.warning(request, "incorrect username/password combinations")
         messages.warning(request,form.errors)      
     context = {
         "form":form
@@ -59,8 +57,8 @@ def classroom_list(request):
 
 def classroom_detail(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
-    students = Student.objects.filter(classroom=classroom).order_by('name','exam_grade')
-    #students = classroom.students.all().order_by('name','exam_grade')
+    #students = Student.objects.filter(classroom=classroom).order_by('name','exam_grade')
+    students = classroom.students.all().order_by('name','-exam_grade')
     context = {
         "classroom": classroom,
         "students": students,
@@ -73,7 +71,7 @@ def classroom_create(request):
         return redirect('signin')
     form = ClassroomForm()
     if request.method == "POST":
-        form = ClassroomForm(request.POST, request.FILES or None)
+        form = ClassroomForm(request.POST)
         if form.is_valid():
             classroom = form.save(commit=False)
             classroom.teacher = request.user
@@ -87,10 +85,11 @@ def classroom_create(request):
     return render(request, 'create_classroom.html', context)
 
 def student_create(request,classroom_id):
-    form = StudentForm()
     classroom = Classroom.objects.get(id=classroom_id)
     if not (request.user == classroom.teacher):
-        return redirect('no-access')
+        messages.success(request, "You have no permissions to add students")
+        return redirect('classroom-list')
+    form = StudentForm()
     if request.method == "POST":
         form = StudentForm(request.POST)
         if form.is_valid():
@@ -108,13 +107,17 @@ def student_create(request,classroom_id):
 
 def student_update(request, student_id):
     student = Student.objects.get(id=student_id)
+    if not (request.user == student.classroom.teacher):
+        messages.success(request, "You have no permissions to update students")
+        return redirect('classroom-list')
     form = StudentForm(instance=student)
     if request.method == "POST":
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
-            messages.success(request, "Successfully Edited!")
-            return redirect('classroom-detail',student.classroom.id)
+            messages.success(request, "Successfully Updeted!")
+            return redirect(student.classroom)
+            #return redirect('classroom-detail',student.classroom.id)
         print (form.errors)
     context = {
     "form": form,
@@ -124,6 +127,9 @@ def student_update(request, student_id):
 
 def student_delete(request, student_id):
     student=Student.objects.get(id=student_id)
+    if not (request.user == student.classroom.teacher):
+        messages.success(request, "You have no permissions to delete students")
+        return redirect('classroom-list')
     student.delete()
     messages.success(request, "Successfully Deleted!")
     return redirect('classroom-detail', student.classroom.id)
@@ -132,7 +138,8 @@ def student_delete(request, student_id):
 def classroom_update(request, classroom_id):
     classroom = Classroom.objects.get(id=classroom_id)
     if not (request.user == classroom.teacher):
-        return redirect('no-access')
+        messages.success(request, "You have no permissions to update classroom")
+        return redirect('classroom-list')
     form = ClassroomForm(instance=classroom)
     if request.method == "POST":
         form = ClassroomForm(request.POST, instance=classroom)
@@ -151,8 +158,9 @@ def classroom_update(request, classroom_id):
 
 def classroom_delete(request, classroom_id):
     classroom_obj=Classroom.objects.get(id=classroom_id).delete()
-    if not (request.user.is_staff):
-        return redirect('no-access')
+    if not (request.user == classroom.teacher):
+        messages.success(request, "You have no permissions to delete classroom")
+        return redirect('classroom-list')
     classroom_obj.delete()
     messages.success(request, "Successfully Deleted!")
     return redirect('classroom-list')
